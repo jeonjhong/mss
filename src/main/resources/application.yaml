@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: musinsa
+  datasource:
+    url: jdbc:h2:mem:musinsa;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: H2
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      data-locations: classpath:/data/data.sql
+      mode: always
+  thymeleaf:
+    enabled: true               # Enable Thymeleaf view resolution
+    cache: false                # Disable template caching (useful for development)
+    check-template-location: true  # Check if the template exists before rendering
+    prefix: classpath:/templates/  # Path where Thymeleaf templates are located
+    suffix: .html               # Suffix for Thymeleaf template files
+    mode: HTML                  # Template mode (HTML5, XML, TEXT, etc.)
+    encoding: UTF-8             # Encoding for templates
+
+logging:
+  level:
+    org.hibernate.SQL: debug

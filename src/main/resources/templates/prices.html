@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>상품 가격</title>
+    <style>
+        /* 전체 레이아웃 */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        /* 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            border-bottom: 1px solid #ddd;
+        }
+
+    </style>
+</head>
+<body>
+
+<h2>Category Prices</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Category</th>
+        <th>Brand</th>
+        <th>Price (₩)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Loop through categoryPrices list -->
+    <tr th:each="product : ${products}">
+        <td th:text="${product.category}"></td>
+        <td th:text="${product.brand}"></td>
+        <td th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 class="total-price">
+    Total Price:
+    <span th:text="${#numbers.formatInteger(totalPrice, 3, 'COMMA')}"></span> 원
+</h3>
+
+</body>
+</html>
