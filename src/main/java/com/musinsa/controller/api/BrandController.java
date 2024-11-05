@@ -19,6 +19,13 @@ public class BrandController {
         return ApiResponse.success(commonIdResponse);
     }
 
+    @PutMapping("/{id}")
+    public ApiResponse<CommonIdResponse> updateBrand(@PathVariable Long id, @RequestBody BrandRequest brandRequest) {
+        brandRequest.setId(id);
+        CommonIdResponse commonIdResponse = brandService.saveOrUpdateBrand(brandRequest);
+        return ApiResponse.success(commonIdResponse);
+    }
+
     @DeleteMapping("/{id}")
     public ApiResponse<CommonIdResponse> deleteBrand(@PathVariable Long id) {
         brandService.deleteBrand(id);

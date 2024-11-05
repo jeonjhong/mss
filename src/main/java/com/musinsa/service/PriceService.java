@@ -16,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -69,40 +67,30 @@ public class PriceService {
     public List<MinMaxPriceEntity> getMinMaxPrices() {
         List<BrandEntity> brands = brandRepository.findAll();
         List<CategoryEntity> categories = categoryRepository.findAll();
-        List<MinMaxPriceEntity> minMaxPriceEntities = new ArrayList<>();
 
-        for (BrandEntity brandEntity : brands) {
-            for (CategoryEntity categoryEntity : categories) {
-                // 해당 브랜드/카테고리에 대한 최소/최대 가격 조회
-                Optional<ProductEntity> minPriceProductOpt =
-                        productRepository.findTopByBrandAndCategoryOrderByPriceAsc(brandEntity, categoryEntity);
-                Optional<ProductEntity> maxPriceProductOpt =
-                        productRepository.findTopByBrandAndCategoryOrderByPriceDesc(brandEntity, categoryEntity);
+        // Use the findByBrandsAndCategories method to fetch all products based on brands and categories
+        List<ProductEntity> products = productRepository.findByBrandsAndCategories(brands, categories);
 
-                if (minPriceProductOpt.isPresent() && maxPriceProductOpt.isPresent()) {
-                    ProductEntity minPriceProduct = minPriceProductOpt.get();
-                    ProductEntity maxPriceProduct = maxPriceProductOpt.get();
+        Map<String, MinMaxPriceEntity> minMaxPriceMap = new HashMap<>();
 
-                    // 기존 데이터가 있는지 확인하고 없으면 새로 생성, 있으면 업데이트
-                    MinMaxPriceEntity minMaxPrice = minMaxPriceRepository.findByBrandAndCategory(brandEntity, categoryEntity)
-                            .orElse(new MinMaxPriceEntity());
+        for (ProductEntity product : products) {
+            String key = product.getBrand().getId() + "-" + product.getCategory().getId();
 
-                    // 브랜드 및 카테고리 설정
-                    minMaxPrice.setBrand(brandEntity);
-                    minMaxPrice.setCategory(categoryEntity);
+            // Retrieve or create a new MinMaxPriceEntity for this brand/category combination
+            MinMaxPriceEntity minMaxPrice = minMaxPriceMap.computeIfAbsent(key, k -> MinMaxPriceEntity.of(product));
 
-                    // 최소/최대 가격 및 해당 상품 ID 설정
-                    minMaxPrice.setMinPrice(minPriceProduct.getPrice());
-                    minMaxPrice.setMaxPrice(maxPriceProduct.getPrice());
-                    minMaxPrice.setMinPriceProductId(minPriceProduct.getId());  // 최소가 상품 ID 저장
-                    minMaxPrice.setMaxPriceProductId(maxPriceProduct.getId());  // 최대가 상품 ID 저장
+            // Update min/max prices and product IDs
+            if (minMaxPrice.getMinPrice() == 0 || product.getPrice().compareTo(minMaxPrice.getMinPrice()) < 0) {
+                minMaxPrice.setMinPrice(product.getPrice());
+                minMaxPrice.setMinPriceProductId(product.getId());
+            }
 
-                    // 결과 리스트에 추가 (저장하지 않고 반환만 할 경우)
-                    minMaxPriceEntities.add(minMaxPrice);
-                }
+            if (minMaxPrice.getMaxPrice() == 0 || product.getPrice().compareTo(minMaxPrice.getMaxPrice()) > 0) {
+                minMaxPrice.setMaxPrice(product.getPrice());
+                minMaxPrice.setMaxPriceProductId(product.getId());
             }
         }
 
-        return minMaxPriceEntities;
+        return new ArrayList<>(minMaxPriceMap.values());
     }
 }

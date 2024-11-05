@@ -15,5 +15,4 @@ public interface MinMaxPriceRepository extends JpaRepository<MinMaxPriceEntity, 
 
     Optional<MinMaxPriceEntity> findByCategory(CategoryEntity categoryEntity);
 
-    List<MinMaxPriceEntity> findByBrand(BrandEntity brand);
 }

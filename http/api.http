@@ -8,7 +8,7 @@ GET http://localhost:8080/api/prices/categories/hat
 ### 모든 카테고리의 상품을 구매할 때 최저가 브랜드 계산
 GET http://localhost:8080/api/prices/cheapest-brand
 
-###
+### 상품 추가
 POST http://localhost:8080/api/products
 Content-Type: application/json
 
@@ -19,11 +19,32 @@ Content-Type: application/json
   "categoryId": 6
 }
 
-###
-DELETE http://localhost:8080/api/products/{{id}}
+### 상품 수정
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
 
-###
+{
+  "name": "새상품",
+  "price": 10,
+  "brandId": 1,
+  "categoryId": 6
+}
+
+
+### 상품 삭제
+DELETE http://localhost:8080/api/products/1
+
+### 브랜드 추가
 POST http://localhost:8080/api/brands
+Content-Type: application/json
+
+### 브랜드 수정
+PUT http://localhost:8080/api/brands/1
+Content-Type: application/json
+
+{
+  "name": "Z"
+}
 
 ###
 DELETE http://localhost:8080/api/brands/{{id}}

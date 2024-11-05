@@ -67,29 +67,36 @@ public class ProductService {
     }
 
     protected Optional<CheapestBrandResponse> calculateBrandTotalPrice(List<CategoryEntity> categories, BrandEntity brand) {
-        List<MinMaxPriceEntity> minMaxPrices = minMaxPriceRepository.findByBrand(brand);
+        // 주어진 브랜드에 해당하는 모든 MinMaxPriceEntity를 조회
+        List<MinMaxPriceEntity> minMaxPrices = minMaxPriceRepository.findAllByBrand(brand);
 
+        // 가격 정보가 없을 경우, 모든 제품에서 최저가를 찾는 메서드 호출
         if (minMaxPrices.isEmpty()) {
             minMaxPrices = findLowestPricesFromAllProducts(brand);
         }
 
+        // MinMaxPriceEntity를 카테고리별로 Map으로 수집 (중복된 카테고리가 있을 경우, 더 낮은 가격을 선택)
         Map<CategoryEntity, MinMaxPriceEntity> priceMap = minMaxPrices.stream()
-                .collect(Collectors.toMap(MinMaxPriceEntity::getCategory, Function.identity()));
+                .collect(Collectors.toMap(
+                        MinMaxPriceEntity::getCategory,  // 카테고리를 키로 사용
+                        Function.identity(),             // MinMaxPriceEntity를 값으로 사용
+                        (existing, replacement) -> existing.getMinPrice() < replacement.getMinPrice() ? existing : replacement // 중복된 카테고리일 경우 더 낮은 가격을 가진 엔티티 선택
+                ));
 
+        // 모든 카테고리가 priceMap에 존재하는지 확인
         boolean hasAllCategories = categories.stream().allMatch(priceMap::containsKey);
 
+        // 카테고리 중 하나라도 누락되었으면 빈 Optional 반환
         if (!hasAllCategories) {
             return Optional.empty();
         }
 
-        List<Product> categoryPrices = new ArrayList<>();
+        // 각 카테고리에 해당하는 Product 객체 리스트 생성
+        List<Product> categoryPrices = categories.stream()
+                .map(category -> Product.of(priceMap.get(category)))  // MinMaxPriceEntity를 Product로 변환
+                .toList();
 
-        for (CategoryEntity category : categories) {
-            MinMaxPriceEntity minMaxPrice = priceMap.get(category);
-            Product product = Product.of(minMaxPrice);
-            categoryPrices.add(product);
-        }
-
+        // 브랜드 이름과 카테고리별 제품 리스트를 포함한 응답 반환
         return Optional.of(CheapestBrandResponse.of(brand.getName(), categoryPrices));
     }
 

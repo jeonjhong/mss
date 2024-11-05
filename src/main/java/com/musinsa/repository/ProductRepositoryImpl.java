@@ -2,7 +2,9 @@ package com.musinsa.repository;
 
 import com.musinsa.model.dto.Product;
 import com.musinsa.model.entity.BrandEntity;
+import com.musinsa.model.entity.CategoryEntity;
 import com.musinsa.model.entity.ProductEntity;
+import com.musinsa.model.entity.QBrandEntity;
 import com.musinsa.model.enums.Category;
 import com.querydsl.core.types.Projections;
 
@@ -66,5 +68,24 @@ public class ProductRepositoryImpl extends QueryDslBaseRepository<ProductEntity>
                 .fetchFirst();
 
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<ProductEntity> findAllByBrand(BrandEntity brandEntity) {
+        return getQueryFactory()
+                .selectFrom(productEntity)
+                .join(productEntity.brand, QBrandEntity.brandEntity).fetchJoin()  // 브랜드를 fetch join으로 한 번에 가져오기
+                .join(productEntity.category).fetchJoin()  // 카테고리도 fetch join으로 한 번에 가져오기
+                .where(productEntity.brand.eq(brandEntity))  // 브랜드 필터링
+                .fetch();
+    }
+
+    @Override
+    public List<ProductEntity> findByBrandsAndCategories(List<BrandEntity> brands, List<CategoryEntity> categories) {
+        return getQueryFactory()
+                .selectFrom(productEntity)
+                .where(productEntity.brand.in(brands)
+                        .and(productEntity.category.in(categories)))
+                .fetch();
     }
 }

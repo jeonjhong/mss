@@ -14,7 +14,14 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ApiResponse<CommonIdResponse> saveOrUpdateProduct(@RequestBody ProductRequest productRequest) {
+    public ApiResponse<CommonIdResponse> saveProduct(@RequestBody ProductRequest productRequest) {
+        CommonIdResponse commonIdResponse = productService.saveOrUpdateProduct(productRequest);
+        return ApiResponse.success(commonIdResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<CommonIdResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest) {
+        productRequest.setId(id);
         CommonIdResponse commonIdResponse = productService.saveOrUpdateProduct(productRequest);
         return ApiResponse.success(commonIdResponse);
     }

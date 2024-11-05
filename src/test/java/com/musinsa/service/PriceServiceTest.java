@@ -153,8 +153,6 @@ class PriceServiceTest {
         assertNotNull(result);
 
         // Verify that the correct number of calls were made to the repositories
-        verify(productRepository, times(4)).findTopByBrandAndCategoryOrderByPriceAsc(any(), any());
-        verify(productRepository, times(4)).findTopByBrandAndCategoryOrderByPriceDesc(any(), any());
-        verify(minMaxPriceRepository, times(4)).findByBrandAndCategory(any(), any());
+        verify(productRepository).findByBrandsAndCategories(any(), any());
     }
 }

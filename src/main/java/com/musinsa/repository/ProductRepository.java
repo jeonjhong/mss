@@ -5,7 +5,6 @@ import com.musinsa.model.entity.CategoryEntity;
 import com.musinsa.model.entity.ProductEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, ProductRepositoryCustom {
@@ -15,5 +14,4 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, P
     // 브랜드와 카테고리에 따른 최대 가격을 가진 상품 조회 (최대가 상품)
     Optional<ProductEntity> findTopByBrandAndCategoryOrderByPriceDesc(BrandEntity brand, CategoryEntity category);
 
-    List<ProductEntity> findAllByBrand(BrandEntity brandEntity);
 }

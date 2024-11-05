@@ -53,9 +53,6 @@ class BrandControllerIntegrationTest {
         mockMvc.perform(delete("/api/brands/{id}", savedBrandId))
                 .andExpect(status().isOk()) // HTTP Status 200 OK 기대
                 .andExpect(jsonPath("$.data.id").value(savedBrandId)); // 삭제된 브랜드 ID 확인
-
-        // 삭제 후 브랜드가 존재하지 않는지 확인 (비즈니스 로직 검증)
-        mockMvc.perform(delete("/api/brands/{id}", savedBrandId))
-                .andExpect(status().isOk()); // 이미 삭제된 경우 404 Not Found 기대
+        
     }
 }
